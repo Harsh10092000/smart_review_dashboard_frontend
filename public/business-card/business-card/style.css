@@ -1,0 +1,200 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+body{
+    background:#eaeaea;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+/* Stand Container */
+.stand{
+    width:640px;
+    height: 1024px;
+      background: url("bg-pattren.jpg") no-repeat center;
+    background-size: cover;
+    border-radius:50px;
+    padding: 20px;
+}
+
+/* Main Card */
+.card{ 
+    
+    padding:24px 18px 20px;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,0.25);
+     border-radius:50px;
+}
+
+/* Business Name */
+.business {
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0px 8px 13px #1a385e4a;
+    /* border-radius: 30px; */
+    padding: 10px 10px 18px 10px;
+    background-color: #04152a00;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+/* Headline */
+.headline {
+    font-size: 46px;
+    font-weight: 800;
+    color: #ffd400;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, .4);
+    margin-bottom: 20px;
+    font-style: italic;
+    line-height: 48px;
+    margin-top: 20px;
+}
+
+.headline span {
+    color: #ffffff;
+    font-size: 41px;
+    font-weight: 700;
+    position: relative;
+}
+.headline span strong {
+    font-size: 52px;
+    font-weight: 600;
+    margin-left: 11px;
+    position: relative;
+    top: 10px;
+}
+
+/* QR */
+.qr-wrapper{
+        display: inline-block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 350px;
+    height: 350px;
+    border-radius: 30px;
+    background: rgb(255 255 255 / 2%);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px;
+        position: relative;
+}
+.feather-bg {
+    position: relative;
+    background: #0a4dbf; /* base color */
+    overflow: hidden;
+}
+
+.feather-bg::before,
+.feather-bg::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 80px;
+    height: 100%;
+    pointer-events: none;
+}
+
+.feather-bg::before {
+       left: 0;
+    background: linear-gradient(to right, rgb(0 40 128), rgba(255, 255, 255, 0));
+}
+
+.feather-bg::after {
+    right: 0;
+    background: linear-gradient(to left, rgb(0 39 127), rgba(255, 255, 255, 0));
+}
+.feather-bg img{
+    margin-left: 7px;
+}
+
+.qr-wrapper img{
+    max-width: 100%;
+}
+.meter {
+    position: absolute;
+    left: -30px;
+    z-index: -1;
+    top: -30px;
+    width: 90px;
+}
+
+/* Ribbon */
+.ribbon{
+    background:linear-gradient(90deg,#ffb400,#ff8c00);
+    color:#07112c;
+    font-weight:700;
+    padding:10px 14px;
+    border-radius:30px;
+    margin:12px auto 16px;
+    width:90%;
+    box-shadow:0 5px 12px rgba(0,0,0,.3);
+        font-size: 22px;
+}
+
+/* Social Icons */
+.social{
+       margin-top: 13px;
+    display: inline-flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-radius: 100px;
+    margin-bottom: 13px;
+    clear: both;
+    /* background-color: #ffffff47; */
+    /* width: 40%; */
+    margin: 10px auto;
+    padding:10px 50px;
+    background: rgb(255 255 255 / 2%);
+    border-radius: 100px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.social img{
+    width:80px;
+        margin-right: 10px;
+}
+
+.trademarks {
+    font-size: 12px;
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    color: #6c7dd7;
+}
+p.footer {
+    font-size: 15px;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.power-by p {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #98a7f5;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+p.feather-bg a {
+    margin-left: 7px;
+    display: block;
+    color: #fff;
+    font-style: italic;
+}

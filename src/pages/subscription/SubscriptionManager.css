@@ -1,0 +1,87 @@
+/* SubscriptionManager.css - Simple Admin Style */
+
+/* Form Modal Styling */
+.MuiDialog-paper {
+    border-radius: 8px !important;
+}
+
+.MuiDialogTitle-root {
+    background: #fff;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+    font-size: 1.125rem !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.MuiDialogContent-root {
+    padding: 20px !important;
+    background: #fff;
+}
+
+.MuiDialogActions-root {
+    padding: 12px 20px !important;
+    gap: 8px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.MuiButton-contained {
+    background: #3b82f6 !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    box-shadow: none !important;
+}
+
+.MuiButton-contained:hover {
+    background: #2563eb !important;
+}
+
+.MuiButton-text {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+}
+
+.MuiButton-outlined {
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    border-radius: 6px !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root {
+    border-radius: 6px;
+}
+
+.MuiFormControl-root .MuiOutlinedInput-root {
+    border-radius: 6px;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #9ca3af;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #3b82f6;
+    border-width: 1px;
+}
+
+.MuiInputLabel-root.Mui-focused {
+    color: #3b82f6;
+}
+
+.MuiSwitch-switchBase.Mui-checked {
+    color: #3b82f6;
+}
+
+.MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track {
+    background-color: #3b82f6;
+}
+
+.MuiCheckbox-root.Mui-checked {
+    color: #3b82f6 !important;
+}
