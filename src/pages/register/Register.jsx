@@ -43,7 +43,7 @@ const Register = () => {
 
             setSuccess(true);
             setTimeout(() => {
-                navigate("/login");
+                navigate("/user-login");
             }, 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Registration failed");
@@ -80,9 +80,10 @@ const Register = () => {
                     fontWeight: 800,
                     color: ACCENT,
                     marginBottom: 8,
-                    letterSpacing: -1
+                    letterSpacing: -1,
+                    textAlign: "center"
                 }}>
-                    EasyReviews
+                    Smart Review System
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 24, color: "#222", marginBottom: 6, textAlign: "center" }}>
                     Create Account
@@ -92,13 +93,22 @@ const Register = () => {
                 </div>
 
                 {success ? (
-                    <div style={{ textAlign: "center", padding: "20px 0" }}>
-                        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-                        <div style={{ color: "#388e3c", fontSize: 18, fontWeight: 600 }}>
-                            Registration successful!
+                    <div style={{ textAlign: "center", padding: "40px 20px" }}>
+                        <div style={{
+                            width: 80, height: 80, background: "#e8f5e9", borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            margin: "0 auto 24px auto"
+                        }}>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
                         </div>
-                        <div style={{ color: "#666", fontSize: 14, marginTop: 8 }}>
-                            Redirecting to login...
+                        <div style={{ color: "#2e7d32", fontSize: 22, fontWeight: 700, marginBottom: 12 }}>
+                            Registration Successful!
+                        </div>
+                        <div style={{ color: "#555", fontSize: 16, lineHeight: "1.5" }}>
+                            Your account has been created.<br />
+                            <span style={{ fontSize: 14, color: "#888", display: "block", marginTop: 8 }}>Redirecting to sign in...</span>
                         </div>
                     </div>
                 ) : (

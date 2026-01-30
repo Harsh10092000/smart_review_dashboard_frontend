@@ -32,7 +32,7 @@ const Login = () => {
       // Set user in context
       setUser(res.data.user);
       setIsLoading(false);
-      navigate("/dashboard");
+      navigate("/allRegUsers");
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Login failed";
       setError(errorMsg);
@@ -73,9 +73,10 @@ const Login = () => {
           fontWeight: 800,
           color: ACCENT,
           marginBottom: 8,
-          letterSpacing: -1
+          letterSpacing: -1,
+          textAlign: "center"
         }}>
-          EasyReviews
+          Smart Review System
         </div>
         <div style={{ fontWeight: 700, fontSize: 24, color: "#222", marginBottom: 6, textAlign: "center" }}>
           Admin Login

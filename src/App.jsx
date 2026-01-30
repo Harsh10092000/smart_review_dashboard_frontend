@@ -74,7 +74,7 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Navigate to="dashboard" replace /> },
+      { index: true, element: <Navigate to="allRegUsers" replace /> },
       // Admin pages
       {
         path: "dashboard",

@@ -81,7 +81,12 @@ export const AuthContextProvider = ({ children }) => {
       setError(null);
       localStorage.removeItem('adminUser');
       // Redirect to login
-      window.location.href = '/login';
+      // Redirect based on current path (User vs Admin)
+      if (window.location.pathname.startsWith('/user')) {
+        window.location.href = '/user-login';
+      } else {
+        window.location.href = '/login';
+      }
     }
   };
 
