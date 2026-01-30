@@ -72,7 +72,7 @@ const UserLogin = () => {
                     marginBottom: 8,
                     letterSpacing: -1
                 }}>
-                    EasyReviews
+                    Smart Review System
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 24, color: "#222", marginBottom: 6, textAlign: "center" }}>
                     User Login
@@ -154,18 +154,16 @@ const UserLogin = () => {
                     </Link>
                 </div>
 
-                <div style={{ width: "100%", textAlign: "center", marginTop: 20, color: "#666", fontSize: 15 }}>
+                <div style={{ width: "100%", textAlign: "center", marginTop: 20, color: "#666", fontSize: 15, marginBottom: 20 }}>
                     Don't have an account?{" "}
                     <Link to="/register" style={{ color: ACCENT, fontWeight: 600, textDecoration: "none" }}>
                         Register
                     </Link>
                 </div>
-
-                <div style={{ width: "100%", textAlign: "center", marginTop: 16, fontSize: 13, color: "#999" }}>
-                    Are you an admin?{" "}
-                    <Link to="/login" style={{ color: "#666", textDecoration: "none" }}>
-                        Admin Login
-                    </Link>
+                <div style={{ width: "100%", textAlign: "center", fontSize: 13, color: "#64748b", borderTop: "1px solid #f1f5f9", paddingTop: 20, marginTop: 10, lineHeight: 1.6 }}>
+                    Powered by <a href="https://calinfo.in" target="_blank" rel="noreferrer" style={{ color: ACCENT, fontWeight: 700, textDecoration: "none" }}>calinfo.in</a>
+                    <br />
+                    All rights reserved <a href="https://bizease.com" target="_blank" rel="noreferrer" style={{ color: ACCENT, fontWeight: 700, textDecoration: "none" }}>bizease.com</a>
                 </div>
             </div>
         </div>

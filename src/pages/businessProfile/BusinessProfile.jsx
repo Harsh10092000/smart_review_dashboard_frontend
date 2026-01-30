@@ -87,7 +87,7 @@ const BusinessProfile = () => {
         qr_token: "",
 
         // New: Owner Name (for AI context)
-        ownerName: "",
+        ownerNames: [], // Array of strings
     });
 
     const backendUrl = import.meta.env.NODE_ENV === 'production'
@@ -131,7 +131,9 @@ const BusinessProfile = () => {
                     // Provide defaults for new fields if missing
                     serviceType: p.promptConfig?.serviceType || "",
                     areas: p.promptConfig?.areas || "",
-                    ownerName: p.promptConfig?.ownerName || "",
+                    serviceType: p.promptConfig?.serviceType || "",
+                    areas: p.promptConfig?.areas || "",
+                    ownerNames: p.promptConfig?.ownerNames || (p.promptConfig?.ownerName ? [p.promptConfig.ownerName] : []), // Migration fallback
                     languagePref: langArray,
                     subdomain: p.subdomain || "",
                     qr_token: p.qr_token || ""
@@ -185,7 +187,7 @@ const BusinessProfile = () => {
     };
 
     const addHeaderLink = () => {
-        if (profile.headerConfig.links.length >= 6) return;
+        if (profile.headerConfig.links.length >= 4) return;
         setProfile({
             ...profile,
             headerConfig: {
@@ -261,7 +263,7 @@ const BusinessProfile = () => {
     const addPlatform = () => {
         setProfile({
             ...profile,
-            platforms: [...profile.platforms, { name: "Google", url: "" }]
+            platforms: [...profile.platforms, { name: "", url: "" }]
         });
     };
 
@@ -304,7 +306,7 @@ const BusinessProfile = () => {
                 promptConfig: {
                     serviceType: profile.serviceType,
                     areas: profile.areas,
-                    ownerName: profile.ownerName
+                    ownerNames: profile.ownerNames || [] // Save array
                 }
             };
 
@@ -456,28 +458,68 @@ const BusinessProfile = () => {
                                     </div>
                                     <div style={{ gridColumn: 'span 2' }}>
                                         <label style={labelStyle}>Custom Subdomain</label>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <input
-                                                type="text"
-                                                name="subdomain"
-                                                value={profile.subdomain || ''}
-                                                onChange={(e) => {
-                                                    // Allow only alphanumeric and hyphens
-                                                    const val = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
-                                                    handleChange({ target: { name: 'subdomain', value: val } });
-                                                }}
-                                                placeholder="my-business"
-                                                maxLength={63}
-                                                style={{ ...inputStyle, fontWeight: 500, flex: 1 }}
-                                            />
-                                            <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500, whiteSpace: 'nowrap' }}>.bizease.com</span>
-                                        </div>
-                                        {profile.subdomain && (
-                                            <div style={{ marginTop: 8, fontSize: 13, color: '#059669', background: '#ecfdf5', padding: '6px 12px', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                                                <span style={{ fontWeight: 600 }}>Preview:</span>
-                                                https://{profile.subdomain}.bizease.com
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                <input
+                                                    type="text"
+                                                    name="subdomain"
+                                                    value={profile.subdomain || ''}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+                                                        handleChange({ target: { name: 'subdomain', value: val } });
+                                                        // Reset status on change
+                                                        if (profile.subdomainStatus) {
+                                                            setProfile(prev => ({ ...prev, subdomainStatus: null }));
+                                                        }
+                                                    }}
+                                                    placeholder="my-business"
+                                                    maxLength={63}
+                                                    style={{ ...inputStyle, fontWeight: 500, flex: 1 }}
+                                                />
+                                                <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500, whiteSpace: 'nowrap' }}>.bizease.com</span>
                                             </div>
-                                        )}
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    {profile.subdomain && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={async () => {
+                                                                if (!profile.subdomain) return;
+                                                                try {
+                                                                    const res = await axios.get(`${backendUrl}/api/profile/check-subdomain/${profile.subdomain}`, { withCredentials: true });
+                                                                    setProfile(prev => ({
+                                                                        ...prev,
+                                                                        subdomainStatus: res.data.available ? 'available' : 'taken'
+                                                                    }));
+                                                                } catch (e) {
+                                                                    console.error(e);
+                                                                }
+                                                            }}
+                                                            style={{ fontSize: 12, padding: '4px 10px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 6, cursor: 'pointer', color: '#475569', fontWeight: 600 }}
+                                                        >
+                                                            Check Availability
+                                                        </button>
+                                                    )}
+                                                    {profile.subdomainStatus === 'available' && (
+                                                        <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                            Available
+                                                        </span>
+                                                    )}
+                                                    {profile.subdomainStatus === 'taken' && (
+                                                        <span style={{ fontSize: 12, color: '#dc2626', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                            Taken
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {profile.subdomain && (
+                                                    <div style={{ fontSize: 12, color: '#059669', background: '#ecfdf5', padding: '4px 10px', borderRadius: 6 }}>
+                                                        <span style={{ fontWeight: 600 }}>Preview:</span> https://{profile.subdomain}.bizease.com
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                     <div>
                                         <label style={labelStyle}>Primary Color (Header)</label>
@@ -512,20 +554,20 @@ const BusinessProfile = () => {
                             <div style={{ marginBottom: 32 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                                     <label style={{ ...labelStyle, fontSize: 16, color: '#1e293b', marginBottom: 0 }}>
-                                        Header Menu Links <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>({profile.headerConfig.links.length}/6)</span>
+                                        Header Menu Links <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>({profile.headerConfig.links.length}/4)</span>
                                     </label>
                                     <button
                                         type="button"
                                         onClick={addHeaderLink}
-                                        disabled={profile.headerConfig.links.length >= 6}
+                                        disabled={profile.headerConfig.links.length >= 4}
                                         style={{
                                             fontSize: 13,
-                                            color: profile.headerConfig.links.length >= 6 ? '#94a3b8' : ACCENT,
-                                            background: profile.headerConfig.links.length >= 6 ? '#f1f5f9' : '#eff6ff',
+                                            color: profile.headerConfig.links.length >= 4 ? '#94a3b8' : ACCENT,
+                                            background: profile.headerConfig.links.length >= 4 ? '#f1f5f9' : '#eff6ff',
                                             padding: '8px 16px',
                                             borderRadius: 20,
                                             border: 'none',
-                                            cursor: profile.headerConfig.links.length >= 6 ? 'not-allowed' : 'pointer',
+                                            cursor: profile.headerConfig.links.length >= 4 ? 'not-allowed' : 'pointer',
                                             fontWeight: 600
                                         }}
                                     >
@@ -643,46 +685,144 @@ const BusinessProfile = () => {
 
                                 {/* AI Config */}
                                 <div>
-                                    <label style={{ ...labelStyle, fontSize: 16, color: '#1e293b', marginBottom: 16 }}>AI Context Settings</label>
-                                    <div style={{ display: 'grid', gap: 20, background: '#f8fafc', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0' }}>
+                                    <label style={{ ...labelStyle, fontSize: 16, color: '#1e293b', marginBottom: 6 }}>AI Context Configuration</label>
+                                    <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>
+                                        These settings train the AI to write more accurate, personalized, and relevant responses for your business.
+                                    </p>
 
-                                        {/* Business Type */}
+                                    <div style={{ display: 'grid', gap: 24, background: '#f8fafc', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0' }}>
+
+                                        {/* Business Category */}
                                         <div>
-                                            <label style={{ fontSize: 13, color: '#64748b', marginBottom: 8, display: 'block', fontWeight: 600 }}>Business Type</label>
-                                            <select name="businessType" value={profile.businessType} onChange={handleChange} style={inputStyle}>
-                                                <option value="">Select Business Type...</option>
+                                            <label style={{ fontSize: 13, color: '#334155', marginBottom: 6, display: 'block', fontWeight: 600 }}>
+                                                Business Category
+                                            </label>
+                                            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                                                Select the category that best describes your industry. This sets the baseline tone for the AI.
+                                            </p>
+                                            <select
+                                                name="businessType"
+                                                value={
+                                                    !profile.businessType
+                                                        ? ""
+                                                        : (BUSINESS_TYPES.some(t => t.value === profile.businessType) && profile.businessType !== 'other')
+                                                            ? profile.businessType
+                                                            : 'other'
+                                                }
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    setProfile({ ...profile, businessType: val });
+                                                }}
+                                                style={inputStyle}
+                                            >
+                                                <option value="">Select Category...</option>
                                                 {BUSINESS_TYPES.map(type => (
                                                     <option key={type.value} value={type.value}>{type.label}</option>
                                                 ))}
                                             </select>
+
+                                            {/* Custom Business Type Input */}
+                                            {((profile.businessType === 'other') || (profile.businessType && !BUSINESS_TYPES.some(t => t.value === profile.businessType))) && (
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. Digital Marketing Agency, Boutique Hotel, Dental Clinic"
+                                                    value={profile.businessType === 'other' ? '' : profile.businessType}
+                                                    onChange={(e) => setProfile({ ...profile, businessType: e.target.value })}
+                                                    style={{ ...inputStyle, marginTop: 12, borderColor: '#3b82f6', background: '#eff6ff' }}
+                                                />
+                                            )}
                                         </div>
 
-                                        {/* Owner Name */}
+                                        {/* Key Team Members */}
                                         <div>
-                                            <label style={{ fontSize: 13, color: '#64748b', marginBottom: 8, display: 'block', fontWeight: 600 }}>Business Owner Name (Optional)</label>
-                                            <input
-                                                type="text"
-                                                name="ownerName"
-                                                value={profile.ownerName}
-                                                onChange={handleChange}
-                                                placeholder="e.g. Mr. Sharma"
-                                                style={inputStyle}
-                                            />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                <label style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>Key Team Members / Owners</label>
+                                                <span style={{ fontSize: 12, color: '#94a3b8' }}>
+                                                    {(profile.ownerNames || []).length}/5
+                                                </span>
+                                            </div>
+                                            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                                                Add names of people often mentioned in reviews (e.g., Dr. Smith, Chef Mario). The AI will recognize them.
+                                            </p>
+                                            <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                                                <input
+                                                    type="text"
+                                                    id="newOwnerInput"
+                                                    placeholder="e.g. Dr. Emily Carter"
+                                                    style={{ ...inputStyle, flex: 1 }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            const val = e.target.value.trim();
+                                                            if (val && (!profile.ownerNames || profile.ownerNames.length < 5)) {
+                                                                const current = profile.ownerNames || [];
+                                                                if (!current.includes(val)) {
+                                                                    setProfile({ ...profile, ownerNames: [...current, val] });
+                                                                    e.target.value = '';
+                                                                }
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const input = document.getElementById('newOwnerInput');
+                                                        const val = input.value.trim();
+                                                        if (val && (!profile.ownerNames || profile.ownerNames.length < 5)) {
+                                                            const current = profile.ownerNames || [];
+                                                            if (!current.includes(val)) {
+                                                                setProfile({ ...profile, ownerNames: [...current, val] });
+                                                                input.value = '';
+                                                            }
+                                                        }
+                                                    }}
+                                                    disabled={profile.ownerNames && profile.ownerNames.length >= 5}
+                                                    style={{
+                                                        background: '#0f172a', color: '#fff', border: 'none', borderRadius: 8, padding: '0 16px', fontWeight: 600, cursor: 'pointer',
+                                                        opacity: profile.ownerNames && profile.ownerNames.length >= 5 ? 0.5 : 1
+                                                    }}
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                                {(profile.ownerNames || []).map((name, idx) => (
+                                                    <div key={idx} style={{ background: '#e0f2fe', color: '#0369a1', padding: '6px 12px', borderRadius: 20, fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                        {name}
+                                                        <span
+                                                            onClick={() => {
+                                                                const newNames = profile.ownerNames.filter((_, i) => i !== idx);
+                                                                setProfile({ ...profile, ownerNames: newNames });
+                                                            }}
+                                                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.6, hover: { opacity: 1 } }}
+                                                        >
+                                                            <IconTrash size={14} />
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                                {(!profile.ownerNames || profile.ownerNames.length === 0) && (
+                                                    <span style={{ fontSize: 13, color: '#94a3b8', fontStyle: 'italic' }}>No names added yet.</span>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        {/* Service Type (Optional) */}
+                                        {/* Service Type / Niche */}
                                         <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                                <label style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>Service Type / Niche</label>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                <label style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>Primary Services & Niche</label>
                                                 <span style={{ fontSize: 12, color: profile.serviceType?.length >= 1000 ? '#ef4444' : '#94a3b8' }}>
                                                     {profile.serviceType?.length || 0}/1000
                                                 </span>
                                             </div>
+                                            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                                                List your main offerings. This ensures the AI highlights your specific strengths in responses.
+                                            </p>
                                             <textarea
                                                 name="serviceType"
                                                 value={profile.serviceType}
                                                 onChange={handleChange}
-                                                placeholder="e.g. Fine Dining, Luxury Homes"
+                                                placeholder="e.g. Fine Dining, Luxury Homes, Implant Dentistry, 24/7 Emergency Service"
                                                 maxLength={1000}
                                                 rows={3}
                                                 style={{ ...inputStyle, resize: 'none', lineHeight: '1.5' }}
@@ -691,17 +831,20 @@ const BusinessProfile = () => {
 
                                         {/* Areas */}
                                         <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                                <label style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>Key Locations / Areas</label>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                <label style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>Target Locations & Neighborhoods</label>
                                                 <span style={{ fontSize: 12, color: profile.areas?.length >= 1000 ? '#ef4444' : '#94a3b8' }}>
                                                     {profile.areas?.length || 0}/1000
                                                 </span>
                                             </div>
+                                            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                                                Specify the areas you serve. The AI will mention these to boost local relevance.
+                                            </p>
                                             <textarea
                                                 name="areas"
                                                 value={profile.areas}
                                                 onChange={handleChange}
-                                                placeholder="Sector 17, downtown, mg road"
+                                                placeholder="e.g. Downtown, Westside, Sector 45, Greater London, MG Road"
                                                 maxLength={1000}
                                                 rows={3}
                                                 style={{ ...inputStyle, resize: 'none', lineHeight: '1.5' }}
@@ -710,19 +853,22 @@ const BusinessProfile = () => {
 
                                         {/* Keywords (Optional) */}
                                         <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                                <label style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>Keywords (Optional)</label>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                <label style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>Brand Voice & Focus Keywords (Optional)</label>
                                                 <span style={{ fontSize: 12, color: profile.keywords?.length >= 1500 ? '#ef4444' : '#94a3b8' }}>
                                                     {profile.keywords?.length || 0}/1500
                                                 </span>
                                             </div>
+                                            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                                                Words you want the AI to emphasize in generated responses. Helps align with your brand voice.
+                                            </p>
                                             <textarea
                                                 name="keywords"
                                                 value={profile.keywords}
                                                 onChange={handleChange}
-                                                placeholder="quality, affordable, trusted, fast delivery"
+                                                placeholder="e.g. Professional, Affordable, Family-owned, Trusted, Innovation, Customer-first"
                                                 maxLength={1500}
-                                                rows={6}
+                                                rows={4}
                                                 style={{ ...inputStyle, resize: 'none' }}
                                             />
                                             <small style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, display: 'block' }}>

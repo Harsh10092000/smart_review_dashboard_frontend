@@ -109,10 +109,24 @@ const QRCard = () => {
                         <h4 className="platform-app">SCAN & SHARE YOUR FEEDBACK!</h4>
 
                         <div className="logos">
-                            <span><img src="/stand-card/google.png" alt="google" /></span>
-                            <span><img src="/stand-card/facebook.png" alt="facebook" /></span>
-                            <span><img src="/stand-card/instagram.png" alt="Instagram" /></span>
-                            {/* <span><img src="/stand-card/youtube.png" alt="youtube" /></span> */}
+                            {(businessProfile.platforms || []).map((platform, idx) => {
+                                let iconSrc = "";
+                                switch (platform.name.toLowerCase()) {
+                                    case 'google': iconSrc = "/stand-card/google.png"; break;
+                                    case 'facebook': iconSrc = "/stand-card/facebook.png"; break;
+                                    case 'instagram': iconSrc = "/stand-card/instagram.png"; break;
+                                    case 'trustpilot': iconSrc = "/stand-card/trust.png"; break;
+                                    case 'youtube': iconSrc = "/stand-card/youtube.png"; break;
+                                    case 'ambitionbox': iconSrc = "/stand-card/ambition-box.png"; break;
+                                    case 'justdial': iconSrc = "/stand-card/justdial.png"; break;
+                                    default: return null;
+                                }
+                                return (
+                                    <span key={idx}>
+                                        <img src={iconSrc} alt={platform.name} />
+                                    </span>
+                                );
+                            })}
                         </div>
 
                         <p className="trademarks">All Trademarks and Logos are owned by their respective holders.</p>

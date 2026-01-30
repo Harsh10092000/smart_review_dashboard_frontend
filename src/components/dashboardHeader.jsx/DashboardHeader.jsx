@@ -46,7 +46,7 @@ const DashboardHeader = ({ onToggleSidebar }) => {
         </div>
         <div className="dashboard-heading text-capitalize" style={{ fontWeight: 700, fontSize: 26, color: '#222' }}>
           {/* {pageName} */}
-          Easy Reviews
+          Smart Review System
         </div>
       </div>
       <div className="d-flex align-items-center dashboard-header-inside-right gap-3">

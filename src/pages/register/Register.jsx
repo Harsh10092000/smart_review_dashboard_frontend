@@ -250,7 +250,7 @@ const Register = () => {
                             {isLoading ? "Creating account..." : "Create Account"}
                         </button>
 
-                        <div style={{ textAlign: "center", color: "#666", fontSize: 14 }}>
+                        <div style={{ textAlign: "center", color: "#666", fontSize: 14, marginBottom: 20 }}>
                             Already have an account?{" "}
                             <Link to="/user-login" style={{ color: ACCENT, fontWeight: 600, textDecoration: "none" }}>
                                 Sign in
@@ -258,6 +258,11 @@ const Register = () => {
                         </div>
                     </form>
                 )}
+                <div style={{ width: "100%", textAlign: "center", fontSize: 13, color: "#64748b", borderTop: "1px solid #f1f5f9", paddingTop: 20, marginTop: 10, lineHeight: 1.6 }}>
+                    Powered by <a href="https://calinfo.in" target="_blank" rel="noreferrer" style={{ color: ACCENT, fontWeight: 700, textDecoration: "none" }}>calinfo.in</a>
+                    <br />
+                    All rights reserved <a href="https://bizease.com" target="_blank" rel="noreferrer" style={{ color: ACCENT, fontWeight: 700, textDecoration: "none" }}>bizease.com</a>
+                </div>
             </div>
         </div>
     );

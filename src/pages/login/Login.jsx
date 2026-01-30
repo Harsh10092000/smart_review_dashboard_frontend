@@ -162,27 +162,16 @@ const Login = () => {
           </Link>
         </div>
         <div style={{ width: "100%", textAlign: "center", marginTop: 28, fontSize: 14, color: "#888" }}>
-          <a
-            href="https://landmarkplots.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/user-login"
             style={{
               color: ACCENT,
               textDecoration: "none",
               fontWeight: 700,
-              marginRight: 12,
             }}
           >
-            Visit Website
-          </a>
-          <span style={{ color: "#bbb" }}>|</span>
-          <a href="#" style={{ color: "#888", textDecoration: "none", marginLeft: 12 }}>
-            Terms of use
-          </a>
-          <span style={{ color: "#bbb", margin: "0 8px" }}>|</span>
-          <a href="#" style={{ color: "#888", textDecoration: "none" }}>
-            Privacy policy
-          </a>
+            User Login
+          </Link>
         </div>
       </div>
     </div>

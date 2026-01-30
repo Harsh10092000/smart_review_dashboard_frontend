@@ -49,7 +49,7 @@ const UserIndex = memo(() => {
                 }}>
                     {/* Logo */}
                     <div style={{ fontSize: 24, fontWeight: 800, color: ACCENT, letterSpacing: -1 }}>
-                        EasyReviews
+                        Smart Review System
                     </div>
 
                     {/* Desktop Nav */}
