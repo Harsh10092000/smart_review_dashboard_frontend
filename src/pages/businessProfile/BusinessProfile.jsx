@@ -47,6 +47,7 @@ const BusinessProfile = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
+    const [logoFile, setLogoFile] = useState(null);
 
     const [profile, setProfile] = useState({
         // Basic & Branding
@@ -127,7 +128,8 @@ const BusinessProfile = () => {
                         social: p.footerConfig?.social || { facebook: "", instagram: "", twitter: "", linkedin: "" }
                     },
                     platforms: p.platforms || [],
-                    logo: p.logo || "",
+                    platforms: p.platforms || [],
+                    logo: (p.logo && p.logo.startsWith('/')) ? `${backendUrl}${p.logo}` : (p.logo || ""),
                     // Provide defaults for new fields if missing
                     serviceType: p.promptConfig?.serviceType || "",
                     areas: p.promptConfig?.areas || "",
@@ -173,6 +175,7 @@ const BusinessProfile = () => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfile(prev => ({ ...prev, logo: reader.result }));
+                setLogoFile(file);
             };
             reader.readAsDataURL(file);
         }
@@ -293,34 +296,47 @@ const BusinessProfile = () => {
         }
 
         try {
-            // Convert language array back to CSV string
-            const langString = Array.isArray(profile.languagePref) ? profile.languagePref.join(", ") : "English";
+            const formData = new FormData();
 
-            const payload = {
+            // Append File if exists
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+
+            // Append other data as JSON string
+            const p = {
                 ...profile,
-                languagePref: langString,
-                theme: {
-                    primaryColor: profile.primaryColor,
-                    secondaryColor: profile.secondaryColor
-                },
+                languagePref: profile.languagePref.join(','),
                 promptConfig: {
                     serviceType: profile.serviceType,
                     areas: profile.areas,
-                    ownerNames: profile.ownerNames || [] // Save array
+                    ownerName: profile.ownerNames?.[0] || "", // Deprecated, keep for sync
+                    ownerNames: profile.ownerNames
                 }
             };
+            formData.append('data', JSON.stringify(p));
 
             const res = await axios.post(
                 `${backendUrl}/api/profile/save`,
-                payload,
-                { withCredentials: true }
+                formData,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'multipart/form-data' } // Make sure this is set
+                }
             );
+
             setSuccess("Profile saved successfully!");
-            if (res.data.slug) {
+            // Update slug if changed
+            if (res.data.slug && res.data.slug !== profile.slug) {
                 setProfile(prev => ({ ...prev, slug: res.data.slug }));
             }
+
+            // Clear file input state to avoid re-uploading valid file on next save without change
+            setLogoFile(null);
+
             setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
+            console.error(err);
             setError(err.response?.data?.message || "Failed to save profile");
         } finally {
             setIsSaving(false);
