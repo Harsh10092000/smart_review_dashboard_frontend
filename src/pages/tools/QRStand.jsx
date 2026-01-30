@@ -120,7 +120,7 @@ const QRStand = () => {
                             <span><img src="/stand-card/google.png" alt="google" /></span>
                             <span><img src="/stand-card/facebook.png" alt="facebook" /></span>
                             <span><img src="/stand-card/instagram.png" alt="Instagram" /></span>
-                            <span><img src="/stand-card/youtube.png" alt="youtube" /></span>
+                            {/* <span><img src="/stand-card/youtube.png" alt="youtube" /></span> */}
                         </div>
 
                         <p class="trademarks">All Trademarks and Logos are owned by their respective holders.</p>

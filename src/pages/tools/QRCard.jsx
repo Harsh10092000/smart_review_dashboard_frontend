@@ -112,7 +112,7 @@ const QRCard = () => {
                             <span><img src="/stand-card/google.png" alt="google" /></span>
                             <span><img src="/stand-card/facebook.png" alt="facebook" /></span>
                             <span><img src="/stand-card/instagram.png" alt="Instagram" /></span>
-                            <span><img src="/stand-card/youtube.png" alt="youtube" /></span>
+                            {/* <span><img src="/stand-card/youtube.png" alt="youtube" /></span> */}
                         </div>
 
                         <p className="trademarks">All Trademarks and Logos are owned by their respective holders.</p>
@@ -122,7 +122,7 @@ const QRCard = () => {
                         <div className="power-by">
                             <p>Powered By</p>
                             <div className="power-logo">
-                                <img src="/stand-card/cal-logo.webp" alt="CAL Info" width="100px" />
+                                <img src="/stand-card/cal-logo.png" alt="CAL Info" width="100px" />
                             </div>
                         </div>
 

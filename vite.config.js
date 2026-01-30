@@ -5,6 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   preview: {
-    allowedHosts: ['admin.landmarkplots.com'],
+    allowedHosts: ['smartreviewpanel.writool.com', 'smartreviewpanelapi.writool.com'],
   },
 })
