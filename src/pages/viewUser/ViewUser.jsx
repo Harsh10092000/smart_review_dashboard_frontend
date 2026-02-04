@@ -7,7 +7,7 @@ import {
     IconWorld, IconMapPin, IconBrandFacebook, IconBrandInstagram,
     IconBrandTwitter, IconBrandLinkedin, IconLink, IconPalette,
     IconRobot, IconLayoutNavbar, IconLayoutBottombar, IconUser, IconSettings,
-    IconChartBar, IconShare
+    IconChartBar, IconShare, IconCreditCard
 } from '@tabler/icons-react';
 
 const ViewUser = () => {
@@ -16,16 +16,19 @@ const ViewUser = () => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
+    const [subscription, setSubscription] = useState(null);
+    const [plans, setPlans] = useState([]);
+    const [subForm, setSubForm] = useState({ planId: '', endDate: '', status: 'active' });
+    const [saving, setSaving] = useState(false);
+
+    const backendUrl = import.meta.env.NODE_ENV === 'production'
+        ? import.meta.env.VITE_BACKEND_PROD
+        : import.meta.env.VITE_BACKEND_DEV;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(
-                    import.meta.env.NODE_ENV === 'production'
-                        ? import.meta.env.VITE_BACKEND_PROD + `/api/users/${id}`
-                        : import.meta.env.VITE_BACKEND_DEV + `/api/users/${id}`
-                );
-
+                const res = await axios.get(`${backendUrl}/api/users/${id}`);
                 if (res.data) {
                     setUser(res.data.user);
                     setProfile(res.data.profile);
@@ -37,7 +40,32 @@ const ViewUser = () => {
             }
         };
 
-        if (id) fetchData();
+        const fetchSubscription = async () => {
+            try {
+                const res = await axios.get(`${backendUrl}/api/admin/subscription/${id}`, { withCredentials: true });
+                if (res.data.hasSubscription) {
+                    setSubscription(res.data.subscription);
+                    setSubForm({
+                        planId: res.data.subscription.plan_id || '',
+                        endDate: res.data.subscription.end_date ? res.data.subscription.end_date.split('T')[0] : '',
+                        status: res.data.subscription.status || 'active'
+                    });
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        const fetchPlans = async () => {
+            try {
+                const res = await axios.get(`${backendUrl}/api/admin/fetchPlans`, { withCredentials: true });
+                if (res.data) setPlans(res.data);
+            } catch (err) { console.error(err); }
+        };
+
+        if (id) {
+            fetchData();
+            fetchSubscription();
+            fetchPlans();
+        }
     }, [id]);
 
     if (loading) return <Loader />;
@@ -57,12 +85,34 @@ const ViewUser = () => {
 
     const primaryColor = theme.primaryColor || '#2563eb';
 
+    const saveSubscription = async () => {
+        setSaving(true);
+        try {
+            await axios.put(`${backendUrl}/api/admin/subscription/update`, {
+                userId: id,
+                planId: subForm.planId,
+                endDate: subForm.endDate,
+                status: subForm.status
+            }, { withCredentials: true });
+            alert('Subscription updated!');
+        } catch (err) {
+            alert('Failed to update subscription');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const tabs = [
         { id: 'overview', label: 'Overview & Contact', icon: <IconUser size={18} /> },
+        { id: 'subscription', label: 'Subscription', icon: <IconCreditCard size={18} /> },
         { id: 'configuration', label: 'Branding & Menu', icon: <IconSettings size={18} /> },
         { id: 'ai', label: 'AI Configuration', icon: <IconRobot size={18} /> },
         { id: 'connections', label: 'Platforms & Social', icon: <IconShare size={18} /> }
     ];
+    console.log("DEBUG: ViewUser Tabs:", tabs);
+    console.log("DEBUG: ViewUser ActiveTab:", activeTab);
+    console.log("DEBUG: ViewUser Subscription Data:", subscription);
+
 
     return (
         <div className="dashboard-main-wrapper" style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem' }}>
@@ -201,6 +251,105 @@ const ViewUser = () => {
                                                     {!profile.website && !profile.google_maps_link && <span className="text-muted small fst-italic">No links added</span>}
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TAB: SUBSCRIPTION */}
+                            {activeTab === 'subscription' && (
+                                <div className="row g-5 fade show">
+                                    <div className="col-md-6 border-end-md">
+                                        <h5 className="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                                            <span className="bg-success-subtle text-success p-2 rounded-3"><IconCreditCard size={20} /></span>
+                                            Current Subscription
+                                        </h5>
+                                        {subscription ? (
+                                            <div className="card border-success bg-success-subtle shadow-none">
+                                                <div className="card-body p-4">
+                                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                                        <div>
+                                                            <h3 className="fw-bold text-success mb-1">{subscription.plan_name || 'Active Plan'}</h3>
+                                                            <span className={`badge ${subscription.status === 'active' ? 'bg-success' : 'bg-danger'} rounded-pill`}>
+                                                                {subscription.status === 'active' ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-end">
+                                                            <div className="small text-muted fw-bold text-uppercase">Wait Days</div>
+                                                            <div className="fs-4 fw-bold text-dark">
+                                                                {subscription.end_date ? Math.max(0, Math.ceil((new Date(subscription.end_date) - new Date()) / (1000 * 60 * 60 * 24))) : '∞'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="d-flex flex-column gap-2">
+                                                        <div className="d-flex justify-content-between border-bottom border-success-subtle pb-2">
+                                                            <span className="text-success-emphasis fw-medium">Start Date</span>
+                                                            <span className="fw-bold text-dark">{subscription.created_at ? new Date(subscription.created_at).toLocaleDateString() : 'N/A'}</span>
+                                                        </div>
+                                                        <div className="d-flex justify-content-between pt-1">
+                                                            <span className="text-success-emphasis fw-medium">End Date</span>
+                                                            <span className="fw-bold text-dark">{subscription.end_date ? new Date(subscription.end_date).toLocaleDateString() : 'Lifetime'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="alert alert-warning border-warning shadow-sm">
+                                                <i className="bi bi-exclamation-circle me-2"></i> User has no active subscription.
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="col-md-6 ps-md-5">
+                                        <h5 className="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                                            <span className="bg-primary-subtle text-primary p-2 rounded-3"><IconSettings size={20} /></span>
+                                            Manage Subscription
+                                        </h5>
+                                        <div className="d-flex flex-column gap-3">
+                                            <div>
+                                                <label className="form-label fw-bold small text-uppercase text-muted">Change Plan</label>
+                                                <select
+                                                    className="form-select"
+                                                    value={subForm.planId}
+                                                    onChange={(e) => setSubForm({ ...subForm, planId: e.target.value })}
+                                                >
+                                                    <option value="">Select Plan...</option>
+                                                    {plans.map(p => (
+                                                        <option key={p.id} value={p.id}>{p.name} - ₹{p.price}/{p.interval_type}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="form-label fw-bold small text-uppercase text-muted">Subscription End Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={subForm.endDate}
+                                                    onChange={(e) => setSubForm({ ...subForm, endDate: e.target.value })}
+                                                />
+                                                <div className="form-text small">Override the default calculated end date.</div>
+                                            </div>
+                                            <div className="mb-3">
+                                                <label className="form-label fw-bold small text-uppercase text-muted">Status</label>
+                                                <div className="form-check form-switch">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="subStatusSwitch"
+                                                        checked={subForm.status === 'active'}
+                                                        onChange={(e) => setSubForm({ ...subForm, status: e.target.checked ? 'active' : 'inactive' })}
+                                                    />
+                                                    <label className="form-check-label fw-medium" htmlFor="subStatusSwitch">
+                                                        {subForm.status === 'active' ? 'Active' : 'Inactive'}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="btn btn-primary w-100 py-2 fw-bold rounded-3"
+                                                onClick={saveSubscription}
+                                                disabled={saving || !subForm.planId}
+                                            >
+                                                {saving ? 'Saving...' : 'Update Subscription'}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

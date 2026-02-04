@@ -179,6 +179,11 @@ const DashboardSideBar = ({ isSidebarOpen, toggleSidebar }) => {
       icon: <IconQrcode size={22} />,
     },
     {
+      name: "My Subscription",
+      url: "/user/subscription",
+      icon: <IconSettings size={22} />,
+    },
+    {
       name: "Logout",
       url: "#",
       icon: <LogoutIcon />,

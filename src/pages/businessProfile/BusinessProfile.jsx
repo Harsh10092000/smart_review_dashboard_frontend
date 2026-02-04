@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context2/AuthContext";
-import { IconTrash, IconBrandGoogle, IconBrandFacebook, IconBrandTripadvisor, IconPlus, IconStar, IconUpload, IconPhoto, IconBrandInstagram, IconBrandTwitter, IconBrandLinkedin, IconBrandYoutube, IconWorld } from "@tabler/icons-react";
+import { IconTrash, IconBrandGoogle, IconBrandFacebook, IconBrandTripadvisor, IconPlus, IconStar, IconUpload, IconPhoto, IconBrandInstagram, IconBrandTwitter, IconBrandLinkedin, IconBrandYoutube, IconWorld, IconBrandWhatsapp, IconCreditCard } from "@tabler/icons-react";
 
 const ACCENT = "#2563eb";
 
@@ -48,6 +48,7 @@ const BusinessProfile = () => {
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
     const [logoFile, setLogoFile] = useState(null);
+    const [subscription, setSubscription] = useState(null);
 
     const [profile, setProfile] = useState({
         // Basic & Branding
@@ -89,6 +90,10 @@ const BusinessProfile = () => {
 
         // New: Owner Name (for AI context)
         ownerNames: [], // Array of strings
+
+        // WhatsApp Floating Button
+        whatsappNumber: "",
+        whatsappMessage: "Hi! I just visited your business.",
     });
 
     const backendUrl = import.meta.env.NODE_ENV === 'production'
@@ -97,9 +102,11 @@ const BusinessProfile = () => {
 
     useEffect(() => {
         fetchProfile();
+        fetchSubscription();
     }, []);
 
     const fetchProfile = async () => {
+        console.log("DEBUG: Frontend using Backend URL:", backendUrl);
         setIsLoading(true);
         try {
             const res = await axios.get(
@@ -138,13 +145,29 @@ const BusinessProfile = () => {
                     ownerNames: p.promptConfig?.ownerNames || (p.promptConfig?.ownerName ? [p.promptConfig.ownerName] : []), // Migration fallback
                     languagePref: langArray,
                     subdomain: p.subdomain || "",
-                    qr_token: p.qr_token || ""
+                    qr_token: p.qr_token || "",
+                    whatsappNumber: p.whatsappNumber || "",
+                    whatsappMessage: p.whatsappMessage || "Hi! I just visited your business."
                 });
             }
         } catch (err) {
             console.log("No existing profile found");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchSubscription = async () => {
+        try {
+            const res = await axios.get(
+                `${backendUrl}/api/subscription/current`,
+                { withCredentials: true }
+            );
+            if (res.data.active) {
+                setSubscription(res.data.subscription);
+            }
+        } catch (err) {
+            console.log("Could not fetch subscription");
         }
     };
 
@@ -426,6 +449,51 @@ const BusinessProfile = () => {
                 <div style={{ padding: 60, textAlign: 'center', color: '#64748b' }}>Loading profile...</div>
             ) : (
                 <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+
+
+
+                    {/* ================= WHATSAPP FLOATING BUTTON SECTION ================= */}
+                    <div style={cardStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 10,
+                                background: '#25D366', display: 'flex',
+                                alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <IconBrandWhatsapp size={22} color="#fff" />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>WhatsApp Floating Button</h3>
+                                <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Appears on your public review page</p>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20 }}>
+                            <div>
+                                <label style={labelStyle}>WhatsApp Number</label>
+                                <input
+                                    type="text"
+                                    name="whatsappNumber"
+                                    value={profile.whatsappNumber}
+                                    onChange={handleChange}
+                                    placeholder="+91 98765 43210"
+                                    style={inputStyle}
+                                />
+                                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Include country code</p>
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Pre-filled Message</label>
+                                <input
+                                    type="text"
+                                    name="whatsappMessage"
+                                    value={profile.whatsappMessage}
+                                    onChange={handleChange}
+                                    placeholder="Hi! I visited your business and..."
+                                    style={inputStyle}
+                                />
+                                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Message customers will send when clicking the button</p>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* ================= SECTION 1: PAGE DETAILS ================= */}
                     <div>

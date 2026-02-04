@@ -28,6 +28,7 @@ import BusinessProfile from './pages/businessProfile/BusinessProfile';
 import AllRegUsers from './pages/allRegUsers/AllRegUsers';
 import ViewUser from './pages/viewUser/ViewUser';
 import SubscriptionManager from './pages/subscription/SubscriptionManager';
+import Subscription from './pages/subscription/Subscription';
 
 // Protected Route Component - works for both admin and user
 const ProtectedRoute = ({ children }) => {
@@ -125,8 +126,13 @@ const router = createBrowserRouter([
         element: <QRCard />
       },
       {
+
         path: "qr-stand",
         element: <QRStand />
+      },
+      {
+        path: "subscription",
+        element: <Subscription />
       }
     ]
   }

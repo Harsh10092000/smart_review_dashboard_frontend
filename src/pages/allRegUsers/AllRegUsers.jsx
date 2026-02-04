@@ -244,6 +244,13 @@ const AllRegUsers = () => {
       sortable: false
     },
     {
+      value: "Plan",
+      customClass: "mobile-hidden-field",
+      sortable: true,
+      field: 'plan_name',
+      currentSort: sortField === 'plan_name' ? sortDirection : null
+    },
+    {
       value: "Status",
       customClass: "mobile-hidden-field",
       sortable: true,
@@ -465,6 +472,18 @@ const AllRegUsers = () => {
                       View Page
                     </a>
                   ) : <span className="text-muted small">-</span>}
+                </div>
+                <div className="div-table-cell mobile-hidden-field">
+                  {item.plan_name ? (
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#0f172a', fontSize: 13 }}>{item.plan_name}</div>
+                      {item.sub_end_date && (
+                        <div style={{ fontSize: 11, color: '#64748b' }}>
+                          {Math.max(0, Math.ceil((new Date(item.sub_end_date) - new Date()) / (1000 * 60 * 60 * 24)))} days left
+                        </div>
+                      )}
+                    </div>
+                  ) : <span className="text-muted small">No Plan</span>}
                 </div>
                 <div className="div-table-cell mobile-hidden-field">
                   <span style={{
