@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context2/AuthContext";
 import { IconTrash, IconBrandGoogle, IconBrandFacebook, IconBrandTripadvisor, IconPlus, IconStar, IconUpload, IconPhoto, IconBrandInstagram, IconBrandTwitter, IconBrandLinkedin, IconBrandYoutube, IconWorld, IconBrandWhatsapp, IconCreditCard } from "@tabler/icons-react";
+import KeywordChipInput from "../../components/KeywordChipInput";
 
 const ACCENT = "#2563eb";
 
@@ -49,6 +50,8 @@ const BusinessProfile = () => {
     const [error, setError] = useState("");
     const [logoFile, setLogoFile] = useState(null);
     const [subscription, setSubscription] = useState(null);
+    const [keywordSuggestions, setKeywordSuggestions] = useState([]);
+    const [showKeywordDropdown, setShowKeywordDropdown] = useState(false);
 
     const [profile, setProfile] = useState({
         // Basic & Branding
@@ -132,7 +135,9 @@ const BusinessProfile = () => {
                     footerConfig: {
                         description: p.footerConfig?.description || "",
                         links: p.footerConfig?.links || [],
-                        social: p.footerConfig?.social || { facebook: "", instagram: "", twitter: "", linkedin: "" }
+                        social: p.footerConfig?.social || { facebook: "", instagram: "", twitter: "", linkedin: "" },
+                        whatsappNumber: p.footerConfig?.whatsappNumber || "",
+                        whatsappMessage: p.footerConfig?.whatsappMessage || ""
                     },
                     platforms: p.platforms || [],
                     platforms: p.platforms || [],
@@ -935,29 +940,24 @@ const BusinessProfile = () => {
                                             />
                                         </div>
 
-                                        {/* Keywords (Optional) */}
+                                        {/* Keywords with Chip Input Component */}
                                         <div>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                                                 <label style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>Brand Voice & Focus Keywords (Optional)</label>
-                                                <span style={{ fontSize: 12, color: profile.keywords?.length >= 1500 ? '#ef4444' : '#94a3b8' }}>
-                                                    {profile.keywords?.length || 0}/1500
-                                                </span>
                                             </div>
                                             <p style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
-                                                Words you want the AI to emphasize in generated responses. Helps align with your brand voice.
+                                                Words you want the AI to emphasize in generated reviews.
                                             </p>
-                                            <textarea
-                                                name="keywords"
-                                                value={profile.keywords}
-                                                onChange={handleChange}
-                                                placeholder="e.g. Professional, Affordable, Family-owned, Trusted, Innovation, Customer-first"
-                                                maxLength={1500}
-                                                rows={4}
-                                                style={{ ...inputStyle, resize: 'none' }}
+                                            <KeywordChipInput
+                                                value={Array.isArray(profile.keywords) ? profile.keywords : (profile.keywords ? profile.keywords.split(',').map(k => k.trim()).filter(k => k) : [])}
+                                                onChange={(keywords) => setProfile({ ...profile, keywords: keywords })}
+                                                businessType={profile.businessType}
+                                                businessName={profile.businessName}
+                                                city={profile.address ? profile.address.split(',').pop().trim() : ''}
+                                                serviceType={profile.serviceType}
+                                                placeholder="Type keyword and press Enter..."
+                                                maxKeywords={20}
                                             />
-                                            <small style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, display: 'block' }}>
-                                                Comma-separated words to include in AI-generated reviews
-                                            </small>
                                         </div>
 
                                         {/* Multi-Select Review Language */}

@@ -29,6 +29,7 @@ import AllRegUsers from './pages/allRegUsers/AllRegUsers';
 import ViewUser from './pages/viewUser/ViewUser';
 import SubscriptionManager from './pages/subscription/SubscriptionManager';
 import Subscription from './pages/subscription/Subscription';
+import CreateDemoUser from './pages/createDemoUser/CreateDemoUser';
 
 // Protected Route Component - works for both admin and user
 const ProtectedRoute = ({ children }) => {
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
       {
         path: "viewUser/:id",
         element: <ViewUser />
+      },
+      {
+        path: "create-demo-user",
+        element: <CreateDemoUser />
       },
       {
         path: "subscription-manager",

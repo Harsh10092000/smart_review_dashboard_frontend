@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   Snackbar,
+  TextField,
 } from "@mui/material";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useContext } from "react";
@@ -93,6 +94,13 @@ const AllRegUsers = () => {
 
   const [openDel, setOpenDel] = useState(false);
   const [delId, setDelId] = useState("");
+
+  // Demo User State
+  const [openDemoDialog, setOpenDemoDialog] = useState(false);
+  const [demoForm, setDemoForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoResult, setDemoResult] = useState(null);
+
   const handleClickOpenDel = (data) => {
     setDelId(data);
     setOpenDel(true);
@@ -365,6 +373,32 @@ const AllRegUsers = () => {
     }
   };
 
+  // Create Demo User
+  const handleCreateDemoUser = async () => {
+    if (!demoForm.name || !demoForm.email || !demoForm.password) {
+      alert('Name, Email and Password are required');
+      return;
+    }
+    setDemoLoading(true);
+    try {
+      const res = await axios.post(
+        (import.meta.env.NODE_ENV === 'production' ? import.meta.env.VITE_BACKEND_PROD : import.meta.env.VITE_BACKEND_DEV) + '/api/admin/createDemoUser',
+        demoForm,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        setDemoResult(res.data.credentials);
+        setChange(change + 1); // Refresh list
+      } else {
+        alert(res.data.message || 'Failed to create demo user');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error creating demo user');
+    } finally {
+      setDemoLoading(false);
+    }
+  };
+
   return (
     <div className="dashboard-main-wrapper">
       <DeleteDialog open={openDel} handleClose={handleCloseDel} deleteProperty={deleteUser} deleteHeading={"Delete this User?"} deleteContent={"Are you sure want to delete this user? You will not be able to recover it."} />
@@ -415,6 +449,37 @@ const AllRegUsers = () => {
         message={"Operation Successful"}
       />
 
+      {/* Create Demo User Dialog */}
+      <Dialog open={openDemoDialog} onClose={() => { setOpenDemoDialog(false); setDemoResult(null); setDemoForm({ name: '', email: '', phone: '', password: '' }); }} maxWidth="sm" fullWidth>
+        <DialogTitle>Create Demo User</DialogTitle>
+        <DialogContent>
+          {demoResult ? (
+            <div style={{ padding: '20px 0' }}>
+              <div style={{ background: '#d4edda', border: '1px solid #c3e6cb', borderRadius: 8, padding: 16, marginBottom: 16 }}>
+                <strong>Demo user created successfully!</strong>
+              </div>
+              <p><strong>Email:</strong> {demoResult.email}</p>
+              <p><strong>Password:</strong> {demoResult.password}</p>
+              <p style={{ fontSize: 12, color: '#666', marginTop: 16 }}>Share these credentials with the demo user. Plan: Demo (2 days)</p>
+            </div>
+          ) : (
+            <>
+              <DialogContentText style={{ marginBottom: 16 }}>
+                Create a demo account with 2-day trial access to all features.
+              </DialogContentText>
+              <TextField label="Name" fullWidth margin="dense" value={demoForm.name} onChange={e => setDemoForm({ ...demoForm, name: e.target.value })} />
+              <TextField label="Email" type="email" fullWidth margin="dense" value={demoForm.email} onChange={e => setDemoForm({ ...demoForm, email: e.target.value })} />
+              <TextField label="Phone (Optional)" fullWidth margin="dense" value={demoForm.phone} onChange={e => setDemoForm({ ...demoForm, phone: e.target.value })} />
+              <TextField label="Password" type="text" fullWidth margin="dense" value={demoForm.password} onChange={e => setDemoForm({ ...demoForm, password: e.target.value })} helperText="You will share this with the user" />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setOpenDemoDialog(false); setDemoResult(null); setDemoForm({ name: '', email: '', phone: '', password: '' }); }}>{demoResult ? 'Close' : 'Cancel'}</Button>
+          {!demoResult && <Button onClick={handleCreateDemoUser} variant="contained" disabled={demoLoading}>{demoLoading ? 'Creating...' : 'Create Demo User'}</Button>}
+        </DialogActions>
+      </Dialog>
+
       <div className="dashboard-main-filters">
         <div className="row">
           <div className="col-md-3">
@@ -427,7 +492,7 @@ const AllRegUsers = () => {
               }}
             />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-7">
             <SearchBar
               value={searchValue}
               onChange={(value) => {
@@ -435,6 +500,11 @@ const AllRegUsers = () => {
                 setCurrentPage(1);
               }}
             />
+          </div>
+          <div className="col-md-2">
+            <Button variant="contained" color="primary" onClick={() => navigate('/create-demo-user')} style={{ height: '100%', width: '100%' }}>
+              + Demo User
+            </Button>
           </div>
         </div>
       </div>
@@ -468,7 +538,7 @@ const AllRegUsers = () => {
                       View Page
                     </a>
                   ) : item.slug ? (
-                    <a href={`http://localhost:3000/${item.slug}`} target="_blank" rel="noreferrer" style={{ fontSize: '12px' }}>
+                    <a href={`${import.meta.env.VITE_WEBSITE_URL || 'https://smartreviewpanel.bizease.com'}/${item.slug}`} target="_blank" rel="noreferrer" style={{ fontSize: '12px' }}>
                       View Page
                     </a>
                   ) : <span className="text-muted small">-</span>}
