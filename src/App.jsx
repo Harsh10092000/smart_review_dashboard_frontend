@@ -46,6 +46,46 @@ const ProtectedRoute = ({ children }) => {
   return children ? children : <Outlet />;
 };
 
+// Admin Only Route - redirects non-admin users
+const AdminRoute = ({ children }) => {
+  const { currentUser, isLoading } = useContext(AuthContext);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/user-login" replace />;
+  }
+
+  // Check if user is admin
+  if (currentUser.role !== 'admin') {
+    return <Navigate to="/user" replace />;
+  }
+
+  return children ? children : <Outlet />;
+};
+
+// User Only Route - redirects admin users to admin dashboard
+const UserOnlyRoute = ({ children }) => {
+  const { currentUser, isLoading } = useContext(AuthContext);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/user-login" replace />;
+  }
+
+  // If admin tries to access user routes, redirect to admin dashboard
+  if (currentUser.role === 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  return children ? children : <Outlet />;
+};
+
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -67,13 +107,13 @@ const router = createBrowserRouter([
     path: "/reset-password",
     element: <ResetPassword />,
   },
-  // Main Dashboard (same layout for both admin and user)
+  // Admin Dashboard Routes (admin only)
   {
     path: "/",
     element: (
-      <ProtectedRoute>
+      <AdminRoute>
         <Index />
-      </ProtectedRoute>
+      </AdminRoute>
     ),
     children: [
       { index: true, element: <Navigate to="allRegUsers" replace /> },
@@ -108,13 +148,13 @@ const router = createBrowserRouter([
       }
     ]
   },
-  // User Dashboard Routes (same layout, different pages)
+  // User Dashboard Routes (user only - redirects admins)
   {
     path: "/user",
     element: (
-      <ProtectedRoute>
+      <UserOnlyRoute>
         <Index />
-      </ProtectedRoute>
+      </UserOnlyRoute>
     ),
     children: [
       { index: true, element: <Navigate to="qr-generator" replace /> },

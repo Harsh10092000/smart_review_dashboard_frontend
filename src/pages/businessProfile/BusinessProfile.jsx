@@ -323,6 +323,20 @@ const BusinessProfile = () => {
             return;
         }
 
+        // Subdomain validation - must be checked and available
+        if (profile.subdomain) {
+            if (!profile.subdomainStatus) {
+                setError("Please check subdomain availability before saving");
+                setIsSaving(false);
+                return;
+            }
+            if (profile.subdomainStatus === 'taken') {
+                setError("Subdomain is already taken. Please choose a different one.");
+                setIsSaving(false);
+                return;
+            }
+        }
+
         try {
             const formData = new FormData();
 

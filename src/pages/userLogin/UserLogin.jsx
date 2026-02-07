@@ -30,7 +30,13 @@ const UserLogin = () => {
 
             setUser(res.data.user);
             setIsLoading(false);
-            navigate("/user/qr-generator");
+
+            // Redirect based on user role
+            if (res.data.user.role === 'admin') {
+                navigate("/allRegUsers"); // Admin dashboard
+            } else {
+                navigate("/user/qr-generator"); // User dashboard
+            }
         } catch (err) {
             const errorMsg = err.response?.data?.message || "Login failed";
             setError(errorMsg);

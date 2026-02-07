@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import "./DashboardSideBar.css";
 import { Link, useLocation } from "react-router-dom";
 import { AddPropertyIcon, AllProperties, MyProperties, LogoutIcon, ChangePasswordIcon } from "../SvgIcons";
-import { IconQrcode, IconBuilding, IconSettings } from "@tabler/icons-react";
+import { IconQrcode, IconBuilding, IconSettings, IconUserPlus } from "@tabler/icons-react";
 import { AuthContext } from "../../context2/AuthContext";
 
 
@@ -134,6 +134,11 @@ const DashboardSideBar = ({ isSidebarOpen, toggleSidebar }) => {
       name: "All Users",
       url: "/allRegUsers",
       icon: <IconBuilding size={22} />,
+    },
+    {
+      name: "Create Demo User",
+      url: "/create-demo-user",
+      icon: <IconUserPlus size={22} />,
     },
     {
       name: "Subscription Plans",

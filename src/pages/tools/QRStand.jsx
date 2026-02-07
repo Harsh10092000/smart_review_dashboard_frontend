@@ -60,8 +60,48 @@ const QRStand = () => {
         qrUrl = `${websiteUrl}?id=${businessProfile.slug}`;
     }
 
-    if (loading) return <div>Loading...</div>;
-    if (!businessProfile) return <div>Please complete your business profile.</div>;
+    if (loading) return (
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+            <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    );
+
+    if (!businessProfile) return (
+        <div style={{ maxWidth: 600, margin: '40px auto', textAlign: 'center', padding: 24 }}>
+            <div style={{
+                background: '#fff',
+                borderRadius: 16,
+                padding: 40,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                border: '1px solid #eee'
+            }}>
+                <div style={{ fontSize: 64, marginBottom: 20 }}>📍</div>
+                <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12, color: '#222' }}>
+                    Setup Required
+                </h2>
+                <p style={{ color: '#666', marginBottom: 24, lineHeight: 1.6 }}>
+                    To generate a QR Stand for reviews, you need to complete your <strong>Business Profile</strong> first.
+                </p>
+                <a
+                    href="/user/business-profile"
+                    style={{
+                        display: 'inline-block',
+                        padding: '12px 32px',
+                        background: '#2563eb',
+                        color: '#fff',
+                        borderRadius: 8,
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: 16
+                    }}
+                >
+                    Complete Business Profile
+                </a>
+            </div>
+        </div>
+    );
 
     return (
         <div className="qr-stand-page p-4">
