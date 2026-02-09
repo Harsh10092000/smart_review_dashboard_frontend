@@ -544,33 +544,68 @@ const AllRegUsers = () => {
                   ) : <span className="text-muted small">-</span>}
                 </div>
                 <div className="div-table-cell mobile-hidden-field">
-                  {item.plan_name ? (
-                    <div>
-                      <div style={{ fontWeight: 600, color: '#0f172a', fontSize: 13 }}>{item.plan_name}</div>
-                      {item.sub_end_date && (
-                        <div style={{ fontSize: 11, color: '#64748b' }}>
-                          {Math.max(0, Math.ceil((new Date(item.sub_end_date) - new Date()) / (1000 * 60 * 60 * 24)))} days left
-                        </div>
-                      )}
-                    </div>
-                  ) : <span className="text-muted small">No Plan</span>}
+                  {item.plan_name ? (() => {
+                    const daysLeft = Math.ceil((new Date(item.sub_end_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    const isExpired = daysLeft <= 0;
+                    const isLastDay = daysLeft === 1;
+                    return (
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#0f172a', fontSize: 13 }}>{item.plan_name}</div>
+                        {item.sub_end_date && (
+                          <div style={{
+                            fontSize: 11,
+                            color: isExpired ? '#dc2626' : isLastDay ? '#ea580c' : '#64748b',
+                            fontWeight: isExpired || isLastDay ? 600 : 400
+                          }}>
+                            {isExpired ? '⚠️ Expired' : isLastDay ? '⏰ Last Day!' : `${daysLeft} days left`}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })() : <span style={{ color: '#dc2626', fontSize: 12, fontWeight: 600 }}>No Plan (Expired)</span>}
                 </div>
                 <div className="div-table-cell mobile-hidden-field">
-                  <span style={{
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    backgroundColor: item.is_active ? "#e6f4ea" : "#ffebee",
-                    color: item.is_active ? "#1e7e34" : "#c62828",
-                    cursor: "pointer",
-                    border: "1px solid " + (item.is_active ? "#1e7e34" : "#c62828")
-                  }}
-                    onClick={() => handleToggleStatus(item.id, item.is_active)}
-                    title="Click to Toggle Status"
-                  >
-                    {item.is_active ? "Active" : "Blocked"}
-                  </span>
+                  {(() => {
+                    const subDaysLeft = item.sub_end_date ? Math.ceil((new Date(item.sub_end_date) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+                    const isPlanExpired = (subDaysLeft !== null && subDaysLeft <= 0) || !item.plan_name;
+
+                    // Determine status: Blocked > Plan Expired/No Plan > Active
+                    let statusText, bgColor, textColor, borderColor;
+                    if (!item.is_active) {
+                      statusText = "Blocked";
+                      bgColor = "#ffebee";
+                      textColor = "#c62828";
+                      borderColor = "#c62828";
+                    } else if (isPlanExpired) {
+                      statusText = item.plan_name ? "Plan Expired" : "No Plan";
+                      bgColor = "#fff3e0";
+                      textColor = "#e65100";
+                      borderColor = "#e65100";
+                    } else {
+                      statusText = "Active";
+                      bgColor = "#e6f4ea";
+                      textColor = "#1e7e34";
+                      borderColor = "#1e7e34";
+                    }
+
+                    return (
+                      <span style={{
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        fontWeight: 500,
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        cursor: "pointer",
+                        border: "1px solid " + borderColor
+                      }}
+                        onClick={() => handleToggleStatus(item.id, item.is_active)}
+                        title="Click to Toggle Account Status"
+                      >
+                        {statusText}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className="div-table-cell div-table-cell-date">
                   {item.created_at ? DateFormat(item.created_at) : "-"}

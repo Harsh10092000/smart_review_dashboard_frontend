@@ -20,6 +20,7 @@ const ViewUser = () => {
     const [plans, setPlans] = useState([]);
     const [subForm, setSubForm] = useState({ planId: '', endDate: '', status: 'active' });
     const [saving, setSaving] = useState(false);
+    const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
 
     const backendUrl = import.meta.env.NODE_ENV === 'production'
         ? import.meta.env.VITE_BACKEND_PROD
@@ -85,8 +86,24 @@ const ViewUser = () => {
 
     const primaryColor = theme.primaryColor || '#2563eb';
 
+    // Function to refetch subscription data
+    const refetchSubscription = async () => {
+        try {
+            const res = await axios.get(`${backendUrl}/api/admin/subscription/${id}`, { withCredentials: true });
+            if (res.data.hasSubscription) {
+                setSubscription(res.data.subscription);
+                setSubForm({
+                    planId: res.data.subscription.plan_id || '',
+                    endDate: res.data.subscription.end_date ? res.data.subscription.end_date.split('T')[0] : '',
+                    status: res.data.subscription.status || 'active'
+                });
+            }
+        } catch (err) { console.error(err); }
+    };
+
     const saveSubscription = async () => {
         setSaving(true);
+        console.log('Saving subscription...');
         try {
             await axios.put(`${backendUrl}/api/admin/subscription/update`, {
                 userId: id,
@@ -94,9 +111,19 @@ const ViewUser = () => {
                 endDate: subForm.endDate,
                 status: subForm.status
             }, { withCredentials: true });
-            alert('Subscription updated!');
+
+            console.log('Save successful, refetching...');
+            // Refetch subscription data to update UI
+            await refetchSubscription();
+
+            console.log('Setting notification...');
+            // Show success notification
+            setNotification({ show: true, message: 'Subscription updated successfully!', type: 'success' });
+            setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 3000);
         } catch (err) {
-            alert('Failed to update subscription');
+            console.error('Save error:', err);
+            setNotification({ show: true, message: 'Failed to update subscription', type: 'error' });
+            setTimeout(() => setNotification({ show: false, message: '', type: 'error' }), 3000);
         } finally {
             setSaving(false);
         }
@@ -116,6 +143,33 @@ const ViewUser = () => {
 
     return (
         <div className="dashboard-main-wrapper" style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem' }}>
+            {/* Notification Popup */}
+            {notification.show && (
+                <div style={{
+                    position: 'fixed',
+                    top: 20,
+                    right: 20,
+                    zIndex: 9999,
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    backgroundColor: notification.type === 'success' ? '#dcfce7' : '#fee2e2',
+                    border: `1px solid ${notification.type === 'success' ? '#22c55e' : '#ef4444'}`,
+                    color: notification.type === 'success' ? '#166534' : '#991b1b',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    animation: 'slideIn 0.3s ease-out'
+                }}>
+                    <span style={{ fontSize: '20px' }}>
+                        {notification.type === 'success' ? '✓' : '✕'}
+                    </span>
+                    {notification.message}
+                </div>
+            )}
+
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>

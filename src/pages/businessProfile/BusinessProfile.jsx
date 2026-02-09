@@ -98,6 +98,7 @@ const BusinessProfile = () => {
         whatsappNumber: "",
         whatsappMessage: "Hi! I just visited your business.",
     });
+    const [originalSubdomain, setOriginalSubdomain] = useState(""); // Track original subdomain to check if changed
 
     const backendUrl = import.meta.env.NODE_ENV === 'production'
         ? import.meta.env.VITE_BACKEND_PROD
@@ -154,6 +155,8 @@ const BusinessProfile = () => {
                     whatsappNumber: p.whatsappNumber || "",
                     whatsappMessage: p.whatsappMessage || "Hi! I just visited your business."
                 });
+                // Track original subdomain to only validate if changed
+                setOriginalSubdomain(p.subdomain || "");
             }
         } catch (err) {
             console.log("No existing profile found");
@@ -323,8 +326,9 @@ const BusinessProfile = () => {
             return;
         }
 
-        // Subdomain validation - must be checked and available
-        if (profile.subdomain) {
+        // Subdomain validation - only required if subdomain was changed from original
+        const subdomainChanged = profile.subdomain !== originalSubdomain;
+        if (profile.subdomain && subdomainChanged) {
             if (!profile.subdomainStatus) {
                 setError("Please check subdomain availability before saving");
                 setIsSaving(false);

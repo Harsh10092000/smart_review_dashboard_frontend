@@ -104,10 +104,20 @@ const Subscription = () => {
                                 <h4 style={{ fontSize: 16, fontWeight: 700, color: '#64748b', marginBottom: 15 }}>Usage & Limits</h4>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#f8fafc', borderRadius: 12 }}>
-                                        <span style={{ color: '#334155', fontWeight: 500 }}>Wait Duration</span>
-                                        <span style={{ fontWeight: 700, color: '#1e293b' }}>
-                                            {Math.max(0, Math.ceil((new Date(subscription.end_date) - new Date()) / (1000 * 60 * 60 * 24)))} days left
-                                        </span>
+                                        <span style={{ color: '#334155', fontWeight: 500 }}>Time Remaining</span>
+                                        {(() => {
+                                            const daysLeft = Math.ceil((new Date(subscription.end_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                            const isExpired = daysLeft <= 0;
+                                            const isLastDay = daysLeft === 1;
+                                            return (
+                                                <span style={{
+                                                    fontWeight: 700,
+                                                    color: isExpired ? '#dc2626' : isLastDay ? '#ea580c' : '#1e293b'
+                                                }}>
+                                                    {isExpired ? '⚠️ Expired' : isLastDay ? '⏰ Last Day!' : `${daysLeft} days left`}
+                                                </span>
+                                            );
+                                        })()}
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#f8fafc', borderRadius: 12 }}>
                                         <span style={{ color: '#334155', fontWeight: 500 }}>Start Date</span>

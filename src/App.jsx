@@ -58,8 +58,13 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/user-login" replace />;
   }
 
-  // Check if user is admin
-  if (currentUser.role !== 'admin') {
+  // Check if user is admin (supports multiple admin roles and type fallback)
+  const isAdmin =
+    currentUser.role === 'admin' ||
+    currentUser.role === 'super_admin' ||
+    currentUser.type === 'admin';
+
+  if (!isAdmin) {
     return <Navigate to="/user" replace />;
   }
 
@@ -79,7 +84,12 @@ const UserOnlyRoute = ({ children }) => {
   }
 
   // If admin tries to access user routes, redirect to admin dashboard
-  if (currentUser.role === 'admin') {
+  const isAdmin =
+    currentUser.role === 'admin' ||
+    currentUser.role === 'super_admin' ||
+    currentUser.type === 'admin';
+
+  if (isAdmin) {
     return <Navigate to="/" replace />;
   }
 
