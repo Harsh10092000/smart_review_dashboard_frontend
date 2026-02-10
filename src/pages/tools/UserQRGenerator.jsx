@@ -85,7 +85,12 @@ const UserQRGenerator = () => {
 
                 // Important: Apply saved logo state, even if null (meaning user removed it)
                 // If conf.logo_url is null, setLogo(null) will correctly remove it.
-                setLogo(conf.logo_url);
+                // If logo is a relative path (from DB), prepend backend URL
+                if (conf.logo_url && !conf.logo_url.startsWith('data:')) {
+                    setLogo(`${backendUrl}${conf.logo_url}`);
+                } else {
+                    setLogo(conf.logo_url);
+                }
 
                 if (conf.logo_size) setLogoSize(conf.logo_size);
                 if (conf.error_level) setLevel(conf.error_level);
@@ -93,7 +98,11 @@ const UserQRGenerator = () => {
                 // No Config exists (First time user) - Use defaults
                 // Fallback: Use profile logo if available
                 if (profile && profile.logo) {
-                    setLogo(profile.logo);
+                    if (!profile.logo.startsWith('data:')) {
+                        setLogo(`${backendUrl}${profile.logo}`);
+                    } else {
+                        setLogo(profile.logo);
+                    }
                 }
             }
 

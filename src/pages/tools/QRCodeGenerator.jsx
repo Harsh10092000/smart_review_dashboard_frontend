@@ -39,6 +39,7 @@ const QRCodeGenerator = () => {
         ? import.meta.env.VITE_BACKEND_PROD
         : import.meta.env.VITE_BACKEND_DEV;
 
+
     useEffect(() => {
         const fetchConfig = async () => {
             try {
@@ -49,7 +50,12 @@ const QRCodeGenerator = () => {
                     setSize(config.size || size);
                     setBgColor(config.bgColor || bgColor);
                     setFgColor(config.fgColor || fgColor);
-                    setLogo(config.logo || null);
+                    // If logo is a relative path (from DB), prepend backend URL
+                    if (config.logo && !config.logo.startsWith('data:')) {
+                        setLogo(`${backendUrl}${config.logo}`);
+                    } else {
+                        setLogo(config.logo || null);
+                    }
                     setLogoSize(config.logoSize || 60);
                     setLevel(config.level || 'H');
                 }
