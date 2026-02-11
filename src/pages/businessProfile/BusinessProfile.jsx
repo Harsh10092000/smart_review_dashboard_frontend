@@ -294,7 +294,15 @@ const BusinessProfile = () => {
         setProfile({ ...profile, platforms: newPlatforms });
     };
 
+    const platformLimit = subscription?.limits_config?.platform_limit || 0;
+    const keywordLimit = subscription?.limits_config?.keyword_limit || 0;
+
     const addPlatform = () => {
+        if (platformLimit > 0 && profile.platforms.length >= platformLimit) {
+            setError(`Platform limit reached. Your plan allows up to ${platformLimit} platform(s). Upgrade your plan for more.`);
+            setTimeout(() => setError(""), 4000);
+            return;
+        }
         setProfile({
             ...profile,
             platforms: [...profile.platforms, { name: "", url: "" }]
@@ -315,6 +323,21 @@ const BusinessProfile = () => {
         // VALIDATIONS
         if (profile.platforms.length === 0) {
             setError("At least 1 review platform is required.");
+            setIsSaving(false);
+            return;
+        }
+
+        // Enforce platform limit
+        if (platformLimit > 0 && profile.platforms.length > platformLimit) {
+            setError(`Platform limit exceeded. Your plan allows up to ${platformLimit} platform(s).`);
+            setIsSaving(false);
+            return;
+        }
+
+        // Enforce keyword limit
+        const currentKeywords = Array.isArray(profile.keywords) ? profile.keywords : (profile.keywords ? profile.keywords.split(',').map(k => k.trim()).filter(k => k) : []);
+        if (keywordLimit > 0 && currentKeywords.length > keywordLimit) {
+            setError(`Keyword limit exceeded. Your plan allows up to ${keywordLimit} keyword(s).`);
             setIsSaving(false);
             return;
         }
@@ -974,7 +997,7 @@ const BusinessProfile = () => {
                                                 city={profile.address ? profile.address.split(',').pop().trim() : ''}
                                                 serviceType={profile.serviceType}
                                                 placeholder="Type keyword and press Enter..."
-                                                maxKeywords={20}
+                                                maxKeywords={keywordLimit > 0 ? keywordLimit : 20}
                                             />
                                         </div>
 
@@ -1021,8 +1044,8 @@ const BusinessProfile = () => {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                                         <label style={{ ...labelStyle, fontSize: 16, color: '#1e293b', marginBottom: 0 }}>Connected Platforms</label>
-                                        <button type="button" onClick={addPlatform} style={{ fontSize: 14, color: '#fff', background: '#0f172a', padding: '10px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                                            <IconPlus size={18} /> Add Platform
+                                        <button type="button" onClick={addPlatform} disabled={platformLimit > 0 && profile.platforms.length >= platformLimit} style={{ fontSize: 14, color: '#fff', background: (platformLimit > 0 && profile.platforms.length >= platformLimit) ? '#94a3b8' : '#0f172a', padding: '10px 20px', borderRadius: 8, border: 'none', cursor: (platformLimit > 0 && profile.platforms.length >= platformLimit) ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                                            <IconPlus size={18} /> Add Platform {platformLimit > 0 ? `(${profile.platforms.length}/${platformLimit})` : ''}
                                         </button>
                                     </div>
                                     <div style={{ display: 'grid', gap: 20 }}>

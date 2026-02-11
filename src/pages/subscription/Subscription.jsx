@@ -127,6 +127,24 @@ const Subscription = () => {
                             </div>
 
                             <div>
+                                <h4 style={{ fontSize: 16, fontWeight: 700, color: '#64748b', marginBottom: 15 }}>Plan Features</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#f0fdf4', borderRadius: 12 }}>
+                                        <span style={{ color: '#334155', fontWeight: 500 }}> Platforms Allowed</span>
+                                        <span style={{ fontWeight: 700, color: '#166534' }}>
+                                            {subscription.limits_config?.platform_limit || 'Unlimited'}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#f0fdf4', borderRadius: 12 }}>
+                                        <span style={{ color: '#334155', fontWeight: 500 }}>🔑 Keywords Limit</span>
+                                        <span style={{ fontWeight: 700, color: '#166534' }}>
+                                            {subscription.limits_config?.keyword_limit || 'Unlimited'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
                                 <h4 style={{ fontSize: 16, fontWeight: 700, color: '#64748b', marginBottom: 15 }}>Actions</h4>
                                 <button disabled style={{
                                     width: '100%', padding: '16px', borderRadius: 12,

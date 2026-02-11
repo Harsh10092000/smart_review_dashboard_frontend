@@ -317,9 +317,9 @@ const KeywordChipInput = ({
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     onFocus={handleFocus}
-                    placeholder={value.length === 0 ? placeholder : "Add more..."}
-                    style={inputStyle}
-                    disabled={editingIndex !== null}
+                    placeholder={value.length >= maxKeywords ? `Limit reached (${maxKeywords})` : (value.length === 0 ? placeholder : "Add more...")}
+                    style={{ ...inputStyle, opacity: value.length >= maxKeywords ? 0.5 : 1 }}
+                    disabled={editingIndex !== null || value.length >= maxKeywords}
                 />
             </div>
 
@@ -344,8 +344,13 @@ const KeywordChipInput = ({
                 </div>
             )}
 
-            <div style={helperTextStyle}>
-                Type & press <strong style={{ margin: '0 2px', color: '#64748b' }}>Enter</strong> to add • Click any chip to <strong style={{ margin: '0 2px', color: '#64748b' }}>Edit</strong> • Backspace to remove
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+                <div style={helperTextStyle}>
+                    Type & press <strong style={{ margin: '0 2px', color: '#64748b' }}>Enter</strong> to add • Click any chip to <strong style={{ margin: '0 2px', color: '#64748b' }}>Edit</strong> • Backspace to remove
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: value.length >= maxKeywords ? '#dc2626' : '#94a3b8' }}>
+                    {value.length}/{maxKeywords} keywords {value.length >= maxKeywords ? '• Limit reached' : ''}
+                </div>
             </div>
         </div>
     );

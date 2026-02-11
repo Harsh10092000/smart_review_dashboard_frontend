@@ -69,10 +69,11 @@ const SubscriptionManager = () => {
 
     const handleSavePlan = async () => {
         try {
-            // Fix Duration Logic
+            // Duration Logic
             let days = 30;
             if (planForm.interval_type === 'yearly') days = 365;
             if (planForm.interval_type === 'lifetime') days = 36500; // 100 years
+            if (planForm.interval_type === 'demo') days = parseInt(planForm.duration_days) || 2; // Custom days for demo
 
             const payload = {
                 id: planForm.id,
@@ -121,7 +122,7 @@ const SubscriptionManager = () => {
             name: plan.name,
             price: plan.price,
             interval_type: plan.interval_type,
-            duration_days: plan.duration_days,
+            duration_days: plan.duration_days || 2,
             limit_reviews: plan.limits_config?.review_limit || 0,
             limit_keywords: plan.limits_config?.keyword_limit || 0,
             limit_platforms: plan.limits_config?.platform_limit || 0,
@@ -220,6 +221,7 @@ const SubscriptionManager = () => {
         { value: "Name", sortable: false },
         { value: "Price", sortable: false },
         { value: "Interval", sortable: false },
+        { value: "Duration", sortable: false },
         { value: "Reviews", sortable: false },
         { value: "Keywords", sortable: false },
         { value: "Platforms", sortable: false },
@@ -328,6 +330,9 @@ const SubscriptionManager = () => {
                                     <div className="div-table-cell">₹{plan.price || 0}</div>
                                     <div className="div-table-cell">
                                         <span className="badge bg-primary">{(plan.interval_type || 'monthly').toUpperCase()}</span>
+                                    </div>
+                                    <div className="div-table-cell">
+                                        {plan.interval_type === 'demo' ? `${plan.duration_days} days` : plan.interval_type === 'yearly' ? '365 days' : plan.interval_type === 'lifetime' ? 'Lifetime' : '30 days'}
                                     </div>
                                     <div className="div-table-cell">{plan.limits_config?.review_limit || 0}</div>
                                     <div className="div-table-cell">{plan.limits_config?.keyword_limit || 0}</div>
@@ -455,12 +460,23 @@ const SubscriptionManager = () => {
                             <FormControl fullWidth>
                                 <InputLabel>Interval</InputLabel>
                                 <Select value={planForm.interval_type} label="Interval" onChange={e => setPlanForm({ ...planForm, interval_type: e.target.value })}>
-                                    <MenuItem value="monthly">Monthly</MenuItem>
-                                    <MenuItem value="yearly">Yearly</MenuItem>
-                                    <MenuItem value="lifetime">Lifetime</MenuItem>
+                                    {planForm.interval_type === 'demo' ? (
+                                        <MenuItem value="demo">Demo</MenuItem>
+                                    ) : (
+                                        [
+                                            <MenuItem key="monthly" value="monthly">Monthly</MenuItem>,
+                                            <MenuItem key="yearly" value="yearly">Yearly</MenuItem>,
+                                            <MenuItem key="lifetime" value="lifetime">Lifetime</MenuItem>,
+                                            <MenuItem key="demo" value="demo">Demo</MenuItem>
+                                        ]
+                                    )}
                                 </Select>
                             </FormControl>
                         </div>
+
+                        {planForm.interval_type === 'demo' && (
+                            <TextField label="Duration (Days)" type="number" fullWidth value={planForm.duration_days} onChange={e => setPlanForm({ ...planForm, duration_days: e.target.value })} helperText="How many days this demo/trial plan is valid" style={{ marginTop: 8 }} />
+                        )}
 
                         <h6 className="fw-bold mt-2">Limits</h6>
                         <div className="row g-2">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -64,6 +64,29 @@ const CreateDemoUser = () => {
     const backendUrl = import.meta.env.NODE_ENV === 'production'
         ? import.meta.env.VITE_BACKEND_PROD
         : import.meta.env.VITE_BACKEND_DEV;
+
+    // Fetch Demo Plan limits
+    const [demoPlanLimits, setDemoPlanLimits] = useState({ platform_limit: 0, keyword_limit: 0, duration_days: 2 });
+    useEffect(() => {
+        const fetchDemoPlanLimits = async () => {
+            try {
+                const res = await axios.get(`${backendUrl}/api/admin/fetchPlans`, { withCredentials: true });
+                const plans = res.data || [];
+                const demoPlan = plans.find(p => p.name === 'Demo Plan');
+                if (demoPlan) {
+                    const limits = typeof demoPlan.limits_config === 'string' ? JSON.parse(demoPlan.limits_config) : demoPlan.limits_config;
+                    setDemoPlanLimits({
+                        platform_limit: limits?.platform_limit || 0,
+                        keyword_limit: limits?.keyword_limit || 0,
+                        duration_days: demoPlan.duration_days || 2
+                    });
+                }
+            } catch (err) {
+                console.log('Could not fetch demo plan limits');
+            }
+        };
+        fetchDemoPlanLimits();
+    }, []);
 
     // User Account Fields
     const [account, setAccount] = useState({
@@ -277,6 +300,10 @@ const CreateDemoUser = () => {
     };
 
     const addPlatform = () => {
+        if (demoPlanLimits.platform_limit > 0 && profile.platforms.length >= demoPlanLimits.platform_limit) {
+            setError(`Demo Plan allows only ${demoPlanLimits.platform_limit} platform(s).`);
+            return;
+        }
         setProfile({ ...profile, platforms: [...profile.platforms, { name: "", url: "", enabled: true }] });
     };
 
@@ -401,7 +428,7 @@ const CreateDemoUser = () => {
                         background: '#fef3c7', color: '#92400e', padding: '4px 12px',
                         borderRadius: 20, fontSize: 12, fontWeight: 600
                     }}>
-                        2 Day Trial
+                        {demoPlanLimits.duration_days} Day Trial
                     </span>
                 </div>
                 <h1 style={{ fontSize: 32, fontWeight: 900, color: "#0f172a", letterSpacing: '-0.8px' }}>
@@ -861,7 +888,7 @@ const CreateDemoUser = () => {
                                             city={profile.address ? profile.address.split(',').pop().trim() : ''}
                                             serviceType={profile.serviceType}
                                             placeholder="Type keyword and press Enter..."
-                                            maxKeywords={20}
+                                            maxKeywords={demoPlanLimits.keyword_limit > 0 ? demoPlanLimits.keyword_limit : 20}
                                         />
                                     </div>
 
@@ -912,8 +939,8 @@ const CreateDemoUser = () => {
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                         <label style={{ ...labelStyle, fontSize: 16, color: '#1e293b', marginBottom: 0 }}>Connected Platforms</label>
-                        <button type="button" onClick={addPlatform} style={{ fontSize: 14, color: '#fff', background: '#0f172a', padding: '10px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <IconPlus size={18} /> Add Platform
+                        <button type="button" onClick={addPlatform} disabled={demoPlanLimits.platform_limit > 0 && profile.platforms.length >= demoPlanLimits.platform_limit} style={{ fontSize: 14, color: '#fff', background: (demoPlanLimits.platform_limit > 0 && profile.platforms.length >= demoPlanLimits.platform_limit) ? '#94a3b8' : '#0f172a', padding: '10px 20px', borderRadius: 8, border: 'none', cursor: (demoPlanLimits.platform_limit > 0 && profile.platforms.length >= demoPlanLimits.platform_limit) ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <IconPlus size={18} /> Add Platform {demoPlanLimits.platform_limit > 0 ? `(${profile.platforms.length}/${demoPlanLimits.platform_limit})` : ''}
                         </button>
                     </div>
                     <div style={{ display: 'grid', gap: 20 }}>

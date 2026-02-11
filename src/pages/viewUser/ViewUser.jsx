@@ -74,6 +74,7 @@ const ViewUser = () => {
 
     // Safe Parsing Helper
     const safeParse = (data) => {
+        if (!data) return {};
         try { return typeof data === 'string' ? JSON.parse(data) : data; } catch (e) { return {}; }
     };
 
@@ -364,7 +365,23 @@ const ViewUser = () => {
                                                 <select
                                                     className="form-select"
                                                     value={subForm.planId}
-                                                    onChange={(e) => setSubForm({ ...subForm, planId: e.target.value })}
+                                                    onChange={(e) => {
+                                                        const selectedPlanId = e.target.value;
+                                                        const selectedPlan = plans.find(p => String(p.id) === String(selectedPlanId));
+                                                        let newEndDate = subForm.endDate;
+                                                        if (selectedPlan) {
+                                                            const start = new Date();
+                                                            if (selectedPlan.interval_type === 'monthly') {
+                                                                start.setMonth(start.getMonth() + 1);
+                                                            } else if (selectedPlan.interval_type === 'yearly') {
+                                                                start.setFullYear(start.getFullYear() + 1);
+                                                            } else if (selectedPlan.duration_days) {
+                                                                start.setDate(start.getDate() + selectedPlan.duration_days);
+                                                            }
+                                                            newEndDate = start.toISOString().split('T')[0];
+                                                        }
+                                                        setSubForm({ ...subForm, planId: selectedPlanId, endDate: newEndDate });
+                                                    }}
                                                 >
                                                     <option value="">Select Plan...</option>
                                                     {plans.map(p => (
